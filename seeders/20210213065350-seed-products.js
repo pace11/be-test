@@ -2,6 +2,7 @@
 
 const parse = require("xml2js");
 const fetch = require("node-fetch");
+const { uuid } = require("../utils");
 
 module.exports = {
   up: async (queryInterface, Sequelize) => {
@@ -40,7 +41,7 @@ module.exports = {
         const product = await data_detail.text();
         parse.parseString(product, (err, result) => {
           allProduct.push({
-            id: result.Product.prdNo[0],
+            uuid: uuid(),
             name: result.Product.prdNm[0],
             description: result.Product.htmlDetail[0],
             image_url: result.Product.prdImage01
