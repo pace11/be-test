@@ -16,10 +16,10 @@
     "port": 5432
   },
   "production": {
-    "username": "postgres",
-    "password": "12345",
-    "database": "jubelio_test",
-    "host": "localhost",
+    "username": "pacegaga_pace",
+    "password": "P@ce1996",
+    "database": "pacegaga_jubelio_test",
+    "host": "45.33.24.136",
     "dialect": "postgres",
     "port": 5432
   }
