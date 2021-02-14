@@ -1,5 +1,7 @@
 "use strict";
 
+const { encryptAES } = require("../utils");
+
 module.exports = {
   up: async (queryInterface, Sequelize) => {
     /**
@@ -10,11 +12,13 @@ module.exports = {
       [
         {
           email: "administrator@mailinator.com",
-          password: "admin",
+          password: encryptAES("admin"),
+          token: encryptAES("token-admin"),
         },
         {
           email: "pace@mailinator.com",
-          password: "pace",
+          password: encryptAES("pace"),
+          token: encryptAES("token-pace"),
         },
       ],
       {}

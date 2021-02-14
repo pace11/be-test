@@ -1,6 +1,6 @@
 const Hapi = require("@hapi/hapi");
 const { sequelize, User, Products } = require("./models");
-// const { uuid } = require("./utils");
+const { decryptAES, encryptAES } = require("./utils");
 
 const init = async () => {
   const server = Hapi.server({
@@ -12,6 +12,7 @@ const init = async () => {
   await sequelize.authenticate();
   console.log("database connected");
 
+  // routing index
   server.route({
     method: "GET",
     path: "/",
@@ -31,26 +32,7 @@ const init = async () => {
     },
   });
 
-  server.route({
-    method: "GET",
-    path: "/users",
-    handler: async (request, h) => {
-      let response = {
-        statusCode: 200,
-        error: false,
-        message: "Ok",
-        data: [],
-      };
-      try {
-        const users = await User.findAll();
-        response.data = users;
-        return response;
-      } catch (error) {
-        console.log("Error users ===>", error);
-      }
-    },
-  });
-
+  // routing to get all products
   server.route({
     method: "GET",
     path: "/products",
@@ -71,6 +53,7 @@ const init = async () => {
     },
   });
 
+  // routing to get specific product by id
   server.route({
     method: "GET",
     path: "/product/{uuid}",
@@ -102,6 +85,7 @@ const init = async () => {
     },
   });
 
+  // routing to edit specific product by id
   server.route({
     method: "PATCH",
     path: "/product/{uuid}",
@@ -146,6 +130,7 @@ const init = async () => {
     },
   });
 
+  // routing to softdeletes specific product by id
   server.route({
     method: "DELETE",
     path: "/product/delete/{uuid}",
@@ -165,6 +150,39 @@ const init = async () => {
         if (product === 1) {
           return response;
         }
+      } catch (error) {
+        console.log("Error users ===>", error);
+      }
+    },
+  });
+
+  // routing to login user
+  server.route({
+    method: "POST",
+    path: "/login",
+    handler: async (request, h) => {
+      let response = {
+        statusCode: 200,
+        error: false,
+        message: "Ok",
+        data: [],
+      };
+      try {
+        const { email, password } = request.payload;
+        console.log("email ===>", email);
+        const user = await User.findOne({
+          where: { email },
+          includes: "users",
+        });
+        if (decryptAES(user.password) !== password) {
+          response.statusCode = 404;
+          response.error = true;
+          response.message = "Not found";
+          response.data = null;
+        } else {
+          response.data = user;
+        }
+        return response;
       } catch (error) {
         console.log("Error users ===>", error);
       }
