@@ -14,6 +14,25 @@ const init = async () => {
 
   server.route({
     method: "GET",
+    path: "/",
+    handler: async (request, h) => {
+      let response = {
+        statusCode: 200,
+        error: false,
+        message: "Ok",
+        data: [],
+      };
+      try {
+        response.message = "Welcome to the API Jubelio TEST";
+        return response;
+      } catch (error) {
+        console.log("Error users ===>", error);
+      }
+    },
+  });
+
+  server.route({
+    method: "GET",
     path: "/users",
     handler: async (request, h) => {
       let response = {
