@@ -1,6 +1,8 @@
 const Hapi = require("@hapi/hapi");
 const { sequelize, User, Products } = require("./models");
-const { decryptAES, encryptAES } = require("./utils");
+const { decryptAES } = require("./utils");
+const { cloudinary } = require("./utils/clodinary");
+require("dotenv").config();
 
 const init = async () => {
   const server = Hapi.server({
@@ -97,31 +99,40 @@ const init = async () => {
         data: [],
       };
       try {
-        const { name, description, sku_no, price, qty } = request.payload;
+        const {
+          name,
+          description,
+          img_url,
+          sku_no,
+          price,
+          qty,
+        } = request.payload;
+        const fileStr = request.payload && request.payload.img_url;
         const { uuid } = request.params;
         const product = await Products.findOne({
           where: { uuid },
           includes: "products",
         });
 
-        {
+        if (img_url && img_url !== product.image_url) {
+          const uploadResponse = await cloudinary.uploader.upload(fileStr);
+          if (uploadResponse) {
+            product.image_url = uploadResponse.url;
+            name && (product.name = name);
+            description && (product.description = description);
+            sku_no && (product.sku_no = sku_no);
+            price && (product.price = parseInt(price));
+            qty && (product.qty = parseInt(qty));
+          }
+        } else {
           name && (product.name = name);
-        }
-        {
           description && (product.description = description);
-        }
-        {
           sku_no && (product.sku_no = sku_no);
-        }
-        {
           price && (product.price = parseInt(price));
-        }
-        {
           qty && (product.qty = parseInt(qty));
         }
 
         await product.save();
-
         response.data = product;
         return response;
       } catch (error) {
@@ -169,7 +180,6 @@ const init = async () => {
       };
       try {
         const { email, password } = request.payload;
-        console.log("email ===>", email);
         const user = await User.findOne({
           where: { email },
           includes: "users",
