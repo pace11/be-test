@@ -8,3 +8,11 @@ be-test with hapi.js
  - run the server with `npm start`. this command automaticaly run file `app.js`
  - checkout in client side or postman with access url `http://localhost:6100`
 
+## Features
+- [x] Nodejs and Hapijs
+- [x] Sequelize ORM
+## User Login Test
+| Email | Password |
+| ------ | ------ |
+| `administrator@mailinator.com` | `admin` |
+| `pace@mailinator.com` | `pace` |
